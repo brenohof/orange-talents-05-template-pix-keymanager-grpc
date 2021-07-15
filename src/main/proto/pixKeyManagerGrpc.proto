@@ -8,13 +8,28 @@ option objc_class_prefix = "HLW";
 package br.com.zup;
 
 service PixKeyManagerGrpcService {
-  rpc send (PixKeyManagerGrpcRequest) returns (PixKeyManagerGrpcReply) {}
+  rpc novaChavePix (NovaChavePixRequestGRpc) returns (NovaChavePixResponseGRpc) {}
 }
 
-message PixKeyManagerGrpcRequest {
-  string name = 1;
+enum TipoDaChave {
+  CPF = 0;
+  TELEFONE_CELULAR = 1;
+  EMAIL = 2;
+  CHAVE_ALEATORIA = 3;
 }
 
-message PixKeyManagerGrpcReply {
-  string message = 1;
+enum TipoDaConta {
+  CONTA_CORRENTE = 0;
+  CONTA_POUPANCA = 1;
+}
+
+message NovaChavePixRequestGRpc {
+  string codigo_interno = 1;
+  TipoDaChave tipo_da_chave = 2;
+  string chave = 3;
+  TipoDaConta tipo_da_conta = 4;
+}
+
+message NovaChavePixResponseGRpc {
+  string pixID = 1;
 }
