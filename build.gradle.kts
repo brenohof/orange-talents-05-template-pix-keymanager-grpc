@@ -40,14 +40,13 @@ dependencies {
     testImplementation("org.testcontainers:junit-jupiter")
     testImplementation("org.testcontainers:postgresql")
     testImplementation("org.testcontainers:testcontainers")
-    implementation("io.micronaut:micronaut-validation")
+    implementation("io.micronaut.beanvalidation:micronaut-hibernate-validator")
     implementation("io.micronaut:micronaut-http-client")
-
+    implementation("org.hibernate:hibernate-validator:6.1.6.Final")
     runtimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
 
     testImplementation("io.micronaut:micronaut-http-client")
     implementation("io.micronaut.xml:micronaut-jackson-xml")
-
 }
 
 

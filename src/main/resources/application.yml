@@ -10,3 +10,13 @@ datasources:
     password: ${DB_PASS:postgres}
     dialect: POSTGRES
 jpa.default.properties.hibernate.hbm2ddl.auto: create-drop
+
+itau:
+  contas:
+    url:
+      ${ ERP_ITAU_URL:`http://localhost:9091` }
+
+bcb:
+  pix:
+    url:
+      ${ BCB_PIX_URL:`http://localhost:8082` }

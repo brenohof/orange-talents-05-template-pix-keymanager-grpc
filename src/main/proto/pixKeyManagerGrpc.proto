@@ -3,7 +3,6 @@ syntax = "proto3";
 option java_multiple_files = true;
 option java_package = "br.com.zup";
 option java_outer_classname = "PixKeyManagerGrpc";
-option objc_class_prefix = "HLW";
 
 package br.com.zup;
 
@@ -12,19 +11,21 @@ service PixKeyManagerGrpcService {
 }
 
 enum TipoDaChave {
-  CPF = 0;
-  TELEFONE_CELULAR = 1;
-  EMAIL = 2;
-  CHAVE_ALEATORIA = 3;
+  UNKNOWN_TIPO_CHAVE = 0;
+  CPF = 1;
+  TELEFONE_CELULAR = 2;
+  EMAIL = 3;
+  CHAVE_ALEATORIA = 4;
 }
 
 enum TipoDaConta {
-  CONTA_CORRENTE = 0;
-  CONTA_POUPANCA = 1;
+  UNKNOWN_TIPO_CONTA = 0;
+  CONTA_CORRENTE = 1;
+  CONTA_POUPANCA = 2;
 }
 
 message NovaChavePixRequestGRpc {
-  string codigo_interno = 1;
+  string cliente_id = 1;
   TipoDaChave tipo_da_chave = 2;
   string chave = 3;
   TipoDaConta tipo_da_conta = 4;
