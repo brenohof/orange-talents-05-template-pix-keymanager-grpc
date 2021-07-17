@@ -1,4 +1,4 @@
-package br.com.zup
+package br.com.zup.pix.registrar
 
 import br.com.zup.pix.TipoDaChave
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest

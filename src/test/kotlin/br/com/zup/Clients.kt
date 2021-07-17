@@ -14,4 +14,10 @@ class Clients {
             PixKeyManagerGrpcServiceGrpc.PixKeyManagerGrpcServiceBlockingStub? {
         return PixKeyManagerGrpcServiceGrpc.newBlockingStub(channel)
     }
+
+    @Singleton
+    fun removeChavePixBlockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):
+            RemovePixKeyGrpcServiceGrpc.RemovePixKeyGrpcServiceBlockingStub? {
+        return RemovePixKeyGrpcServiceGrpc.newBlockingStub(channel)
+    }
 }

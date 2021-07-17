@@ -1,5 +1,9 @@
-package br.com.zup
+package br.com.zup.pix.registrar
 
+import br.com.zup.NovaChavePixRequestGRpc
+import br.com.zup.PixKeyManagerGrpcServiceGrpc
+import br.com.zup.TipoDaChave
+import br.com.zup.TipoDaConta
 import br.com.zup.erp_itau.DadosDaContaResponse
 import br.com.zup.erp_itau.ErpItauClient
 import br.com.zup.erp_itau.InstituicaoResponse
@@ -24,38 +28,25 @@ class NovaChavePixServiceTest(
     val erpItauClient: ErpItauClient
 ) {
 
-    lateinit var clienteId: String
-    lateinit var tipoDaConta: TipoDaConta
-    lateinit var dadosContaCliente: DadosDaContaResponse
+    val clienteId: String = "c56dfef4-7901-44fb-84e2-a2cefb157890"
+    val tipoDaConta: TipoDaConta = TipoDaConta.CONTA_CORRENTE
+    val dadosContaCliente = DadosDaContaResponse(
+        tipo = tipoDaConta,
+        agencia = "0001",
+        numero = "291900",
+        instituicao = InstituicaoResponse("ITAÚ UNIBANCO S.A.", "60701190"),
+        titular = TitularResponse(clienteId, "Rafael M C Ponte", "02467781054")
+    )
 
     @BeforeEach
     internal fun setUp() {
         chavePixRepository.deleteAll()
-        clienteId = "c56dfef4-7901-44fb-84e2-a2cefb157890"
-        tipoDaConta = TipoDaConta.CONTA_CORRENTE
-
-        dadosContaCliente = dadosDaContaResponse()
 
         Mockito.`when`(erpItauClient.consultarContaDoCliente(
             clienteId,
             tipoDaConta.toString()
         )).thenReturn(HttpResponse.ok(dadosContaCliente))
     }
-
-    private fun dadosDaContaResponse() = DadosDaContaResponse(
-        tipoDaConta,
-        InstituicaoResponse(
-            "ITAÚ UNIBANCO S.A.",
-            "60701190"
-        ),
-        agencia = "0001",
-        numero = "291900",
-        TitularResponse(
-            clienteId,
-            "Rafael M C Ponte",
-            "02467781054"
-        )
-    )
 
     @Test
     internal fun `deve criar uma nova chave pix`() {
@@ -98,13 +89,14 @@ class NovaChavePixServiceTest(
 
     @Test
     internal fun `nao deve inserir ao nao encontrar o cliente no itau`() {
+        val idInexistente = "c56dfef4-7901-44fb-84e2-a2cefb157891"
         Mockito.`when`(erpItauClient.consultarContaDoCliente(
-            "1234",
+            idInexistente,
             tipoDaConta.toString()
         )).thenReturn(HttpResponse.notFound())
 
         val request = NovaChavePixRequestGRpc.newBuilder()
-            .setClienteId("1234")
+            .setClienteId(idInexistente)
             .setTipoDaChave(TipoDaChave.CPF)
             .setChave("67419644012")
             .setTipoDaConta(tipoDaConta)
@@ -156,6 +148,26 @@ class NovaChavePixServiceTest(
 
         with(error) {
             assertEquals(Status.INVALID_ARGUMENT.code, status.code)
+            assertFalse(chavePixRepository.existsByChave(request.chave))
+        }
+    }
+
+    @Test
+    internal fun `nao deve inserir uma nova chave pix com cliente UUID invalido`() {
+        val request = NovaChavePixRequestGRpc.newBuilder()
+            .setClienteId("-x2xc")
+            .setTipoDaChave(TipoDaChave.CPF)
+            .setChave("67419644012")
+            .setTipoDaConta(tipoDaConta)
+            .build()
+
+        val error = assertThrows<StatusRuntimeException> {
+            grpcClient.novaChavePix(request)
+        }
+
+        with(error) {
+            assertEquals(Status.INVALID_ARGUMENT.code, status.code)
+            assertEquals("registra.novaChave.clienteId: não é um formato válido de UUID", status.description)
             assertFalse(chavePixRepository.existsByChave(request.chave))
         }
     }
