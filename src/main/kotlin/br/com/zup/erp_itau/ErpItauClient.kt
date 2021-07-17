@@ -12,4 +12,7 @@ interface ErpItauClient {
 
     @Get("/clientes/{clienteId}/contas")
     fun consultarContaDoCliente(@PathVariable clienteId: String, @QueryValue tipo: String) : HttpResponse<DadosDaContaResponse>
+
+    @Get("/clientes/{clienteId}")
+    fun consultarClientePeloId(@PathVariable clienteId: String) : HttpResponse<DadosDoClienteResponse>
 }

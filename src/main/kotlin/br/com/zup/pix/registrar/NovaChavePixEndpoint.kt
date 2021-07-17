@@ -2,6 +2,7 @@ package br.com.zup.pix.registrar
 
 import br.com.zup.*
 import br.com.zup.common.ErrorHandler
+import br.com.zup.pix.toNovaChavePix
 import io.grpc.stub.StreamObserver
 import javax.inject.Singleton
 

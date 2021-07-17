@@ -10,6 +10,19 @@ service PixKeyManagerGrpcService {
   rpc novaChavePix (NovaChavePixRequestGRpc) returns (NovaChavePixResponseGRpc) {}
 }
 
+service RemovePixKeyGrpcService {
+  rpc removeChavePix (RemoveChavePixRequestGRpc) returns (RemoveChavePixResponseGRpc) {}
+}
+
+message RemoveChavePixRequestGRpc{
+  string pix_id = 1;
+  string cliente_id = 2;
+}
+
+message RemoveChavePixResponseGRpc {
+  string message = 1;
+}
+
 enum TipoDaChave {
   UNKNOWN_TIPO_CHAVE = 0;
   CPF = 1;

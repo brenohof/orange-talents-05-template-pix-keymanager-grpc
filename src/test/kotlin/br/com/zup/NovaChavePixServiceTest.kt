@@ -5,12 +5,12 @@ import br.com.zup.erp_itau.ErpItauClient
 import br.com.zup.erp_itau.InstituicaoResponse
 import br.com.zup.erp_itau.TitularResponse
 import br.com.zup.pix.ChavePixRepository
+import br.com.zup.pix.toNovaChavePix
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.micronaut.http.HttpResponse
 import io.micronaut.test.annotation.MockBean
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
-import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
