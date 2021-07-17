@@ -1,6 +1,6 @@
 package br.com.zup
 
-import br.com.zup.pix.nova_chave.NovaChavePix
+import br.com.zup.pix.registrar.NovaChavePix
 
 
 fun NovaChavePixRequestGRpc.toNovaChavePix(): NovaChavePix {

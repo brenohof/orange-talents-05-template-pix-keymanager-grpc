@@ -1,4 +1,4 @@
-package br.com.zup.pix.nova_chave
+package br.com.zup.pix.registrar
 
 import br.com.zup.common.handlers.ChavePixExistenteException
 import br.com.zup.erp_itau.ErpItauClient

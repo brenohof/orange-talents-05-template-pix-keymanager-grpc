@@ -1,4 +1,4 @@
-package br.com.zup.pix.nova_chave
+package br.com.zup.pix.registrar
 
 import br.com.zup.*
 import br.com.zup.common.ErrorHandler

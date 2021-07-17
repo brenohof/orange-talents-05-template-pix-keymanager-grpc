@@ -10,9 +10,6 @@ import io.micronaut.http.client.annotation.Client
 @Client("\${itau.contas.url}/api/v1/")
 interface ErpItauClient {
 
-    @Get("/clientes/{clienteId}")
-    fun consultarClientePeloId(@PathVariable clienteId: String) : HttpResponse<DadosDoClienteResponse>
-
     @Get("/clientes/{clienteId}/contas")
     fun consultarContaDoCliente(@PathVariable clienteId: String, @QueryValue tipo: String) : HttpResponse<DadosDaContaResponse>
 }

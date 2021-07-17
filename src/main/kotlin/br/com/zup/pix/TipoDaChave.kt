@@ -22,7 +22,7 @@ enum class TipoDaChave {
         override fun valida(chave: String?): Boolean {
             if (chave.isNullOrBlank()) return false
 
-            return chave.matches("^\\+[1-9][0-9][1-9]{2}9[1-9]{8}\$".toRegex())
+            return chave.matches("^\\+[1-9][0-9][1-9]{2}9[1-9][0-9]{7}\$".toRegex())
         }
     },
     EMAIL {

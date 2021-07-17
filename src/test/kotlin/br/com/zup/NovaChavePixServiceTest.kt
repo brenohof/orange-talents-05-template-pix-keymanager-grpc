@@ -8,10 +8,7 @@ import br.com.zup.pix.ChavePixRepository
 import io.grpc.Status
 import io.grpc.StatusRuntimeException
 import io.micronaut.http.HttpResponse
-import io.micronaut.http.client.HttpClient
-import io.micronaut.http.client.annotation.Client
 import io.micronaut.test.annotation.MockBean
-import io.micronaut.test.annotation.TransactionMode
 import io.micronaut.test.extensions.junit5.annotation.MicronautTest
 import org.junit.jupiter.api.Assertions
 import org.junit.jupiter.api.Assertions.*
@@ -37,26 +34,28 @@ class NovaChavePixServiceTest(
         clienteId = "c56dfef4-7901-44fb-84e2-a2cefb157890"
         tipoDaConta = TipoDaConta.CONTA_CORRENTE
 
-        dadosContaCliente = DadosDaContaResponse(
-            tipoDaConta,
-            InstituicaoResponse(
-                "ITAÚ UNIBANCO S.A.",
-                "60701190"
-            ),
-            agencia = "0001",
-            numero = "291900",
-            TitularResponse(
-                clienteId,
-                "Rafael M C Ponte",
-                "02467781054"
-            )
-        )
+        dadosContaCliente = dadosDaContaResponse()
 
         Mockito.`when`(erpItauClient.consultarContaDoCliente(
             clienteId,
             tipoDaConta.toString()
         )).thenReturn(HttpResponse.ok(dadosContaCliente))
     }
+
+    private fun dadosDaContaResponse() = DadosDaContaResponse(
+        tipoDaConta,
+        InstituicaoResponse(
+            "ITAÚ UNIBANCO S.A.",
+            "60701190"
+        ),
+        agencia = "0001",
+        numero = "291900",
+        TitularResponse(
+            clienteId,
+            "Rafael M C Ponte",
+            "02467781054"
+        )
+    )
 
     @Test
     internal fun `deve criar uma nova chave pix`() {
@@ -76,7 +75,7 @@ class NovaChavePixServiceTest(
     }
 
     @Test
-    internal fun `deve falhar quando inserir chave ja existente`() {
+    internal fun `nao deve inserir chave ja existente`() {
         val request = NovaChavePixRequestGRpc.newBuilder()
             .setClienteId(clienteId)
             .setTipoDaChave(TipoDaChave.CPF)
@@ -98,7 +97,7 @@ class NovaChavePixServiceTest(
     }
 
     @Test
-    internal fun `deve falhar ao nao encontrar o cliente no itau`() {
+    internal fun `nao deve inserir ao nao encontrar o cliente no itau`() {
         Mockito.`when`(erpItauClient.consultarContaDoCliente(
             "1234",
             tipoDaConta.toString()
@@ -118,11 +117,12 @@ class NovaChavePixServiceTest(
         with(error) {
             assertEquals(Status.FAILED_PRECONDITION.code, status.code)
             assertEquals("Cliente não encontrado no Itau.", status.description)
+            assertFalse(chavePixRepository.existsByChave(request.chave))
         }
     }
 
     @Test
-    internal fun `deve falhar ao passar conta do tipo UNKNOW`() {
+    internal fun `nao deve inserir ao passar conta do tipo UNKNOW`() {
         val request = NovaChavePixRequestGRpc.newBuilder()
             .setClienteId(clienteId)
             .setTipoDaChave(TipoDaChave.CPF)
@@ -135,8 +135,28 @@ class NovaChavePixServiceTest(
         }
 
         with(error) {
-            Assertions.assertEquals(Status.INVALID_ARGUMENT.code, status.code)
+            assertEquals(Status.INVALID_ARGUMENT.code, status.code)
             assertEquals("registra.novaChave.tipoDaConta: não deve ser nulo", status.description)
+            assertFalse(chavePixRepository.existsByChave(request.chave))
+        }
+    }
+
+    @Test
+    internal fun `nao deve inserir ao passar chave do tipo UNKNOW`() {
+        val request = NovaChavePixRequestGRpc.newBuilder()
+            .setClienteId(clienteId)
+            .setTipoDaChave(TipoDaChave.UNKNOWN_TIPO_CHAVE)
+            .setChave("67419644012")
+            .setTipoDaConta(tipoDaConta)
+            .build()
+
+        val error = assertThrows<StatusRuntimeException> {
+            grpcClient.novaChavePix(request)
+        }
+
+        with(error) {
+            assertEquals(Status.INVALID_ARGUMENT.code, status.code)
+            assertFalse(chavePixRepository.existsByChave(request.chave))
         }
     }
 

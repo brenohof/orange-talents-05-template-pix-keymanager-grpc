@@ -20,6 +20,3 @@ data class DadosDaContaResponse(
         )
     }
 }
-
-data class InstituicaoResponse(val nome: String, val ispb: String)
-data class TitularResponse(val id: String, val nome: String, val cpf: String)
