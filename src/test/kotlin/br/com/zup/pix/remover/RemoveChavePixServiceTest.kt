@@ -4,6 +4,9 @@ import br.com.zup.RemoveChavePixRequestGRpc
 import br.com.zup.RemovePixKeyGrpcServiceGrpc
 import br.com.zup.TipoDaChave
 import br.com.zup.TipoDaConta
+import br.com.zup.bcb.BcbClient
+import br.com.zup.bcb.DeletePixKeyRequest
+import br.com.zup.bcb.DeletePixKeyResponse
 import br.com.zup.erp_itau.*
 import br.com.zup.pix.ChavePix
 import br.com.zup.pix.ChavePixRepository
@@ -17,15 +20,18 @@ import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.assertThrows
 import org.mockito.Mockito
+import java.time.LocalDateTime
 
 @MicronautTest(transactional = false)
 class RemoveChavePixServiceTest(
     val repository: ChavePixRepository,
     val erpItauClient: ErpItauClient,
+    val bcbClient: BcbClient,
     val gRpcClient: RemovePixKeyGrpcServiceGrpc.RemovePixKeyGrpcServiceBlockingStub
 ) {
     val clienteId: String = "c56dfef4-7901-44fb-84e2-a2cefb157890"
     val tipoDaConta: TipoDaConta = TipoDaConta.CONTA_CORRENTE
+    val chave = "67419644012"
     val instituicao = InstituicaoResponse("ITAÚ UNIBANCO S.A.", "60701190")
     val dadosContaCliente = DadosDaContaResponse(
         tipo = tipoDaConta,
@@ -40,26 +46,32 @@ class RemoveChavePixServiceTest(
         nome = "Rafael M C Ponte",
         cpf = "02467781054",
     )
+    lateinit var chavePix: ChavePix
 
     @BeforeEach
     internal fun setUp() {
+        val ispb = dadosDoCliente.instituicao.ispb
         repository.deleteAll()
 
-        Mockito.`when`(erpItauClient.consultarClientePeloId(
-            clienteId,
-        )).thenReturn(HttpResponse.ok(dadosDoCliente))
-    }
-
-    @Test
-    internal fun `deve remover uma chave pix`() {
-        val chavePix = repository.save(ChavePix(
+        chavePix = repository.save(ChavePix(
             clienteId,
             TipoDaChave.CPF,
-            "67419644012",
+            chave,
             tipoDaConta,
             dadosContaCliente.toModel()
         ))
 
+        Mockito.`when`(erpItauClient.consultarClientePeloId(
+            clienteId,
+        )).thenReturn(HttpResponse.ok(dadosDoCliente))
+
+        Mockito.`when`(bcbClient.removerChavePix(
+            chave, DeletePixKeyRequest(chave, ispb)
+        )).thenReturn(HttpResponse.ok(DeletePixKeyResponse(chave, ispb, LocalDateTime.now())))
+    }
+
+    @Test
+    internal fun `deve remover uma chave pix`() {
         val request = RemoveChavePixRequestGRpc.newBuilder()
             .setClienteId(clienteId)
             .setPixId(chavePix.id)
@@ -73,14 +85,6 @@ class RemoveChavePixServiceTest(
 
     @Test
     internal fun `nao deve remover chave com pix UUID invalido`() {
-        val chavePix = repository.save(ChavePix(
-            clienteId,
-            TipoDaChave.CPF,
-            "67419644012",
-            tipoDaConta,
-            dadosContaCliente.toModel()
-        ))
-
         val request = RemoveChavePixRequestGRpc.newBuilder()
             .setClienteId(clienteId)
             .setPixId("x23928")
@@ -99,14 +103,6 @@ class RemoveChavePixServiceTest(
 
     @Test
     internal fun `nao deve remover chave com cliente UUID invalido`() {
-        val chavePix = repository.save(ChavePix(
-            clienteId,
-            TipoDaChave.CPF,
-            "67419644012",
-            tipoDaConta,
-            dadosContaCliente.toModel()
-        ))
-
         val request = RemoveChavePixRequestGRpc.newBuilder()
             .setClienteId("29388s")
             .setPixId(chavePix.id)
@@ -125,14 +121,6 @@ class RemoveChavePixServiceTest(
 
     @Test
     internal fun `nao deve remover chave que nao for encontrada`() {
-        val chavePix = repository.save(ChavePix(
-            clienteId,
-            TipoDaChave.CPF,
-            "67419644012",
-            tipoDaConta,
-            dadosContaCliente.toModel()
-        ))
-
         val request = RemoveChavePixRequestGRpc.newBuilder()
             .setClienteId(clienteId)
             .setPixId(chavePix.id)
@@ -158,14 +146,6 @@ class RemoveChavePixServiceTest(
             idInexistente,
         )).thenReturn(HttpResponse.notFound())
 
-        val chavePix = repository.save(ChavePix(
-            clienteId,
-            TipoDaChave.CPF,
-            "67419644012",
-            tipoDaConta,
-            dadosContaCliente.toModel()
-        ))
-
         val request = RemoveChavePixRequestGRpc.newBuilder()
             .setClienteId(idInexistente)
             .setPixId(chavePix.id)
@@ -189,14 +169,6 @@ class RemoveChavePixServiceTest(
             clienteDiferente,
         )).thenReturn(HttpResponse.ok(dadosDoCliente))
 
-        val chavePix = repository.save(ChavePix(
-            clienteId,
-            TipoDaChave.CPF,
-            "67419644012",
-            tipoDaConta,
-            dadosContaCliente.toModel()
-        ))
-
         val request = RemoveChavePixRequestGRpc.newBuilder()
             .setClienteId(clienteDiferente)
             .setPixId(chavePix.id)
@@ -213,8 +185,36 @@ class RemoveChavePixServiceTest(
         }
     }
 
+    @Test
+    internal fun `deve falhar ao tentar remover chave Pix nao existente no BCB`() {
+        Mockito.`when`(bcbClient.removerChavePix(
+            chave, DeletePixKeyRequest(chave, dadosContaCliente.instituicao.ispb)
+        )).thenReturn(HttpResponse.notFound())
+
+        val request = RemoveChavePixRequestGRpc.newBuilder()
+            .setClienteId(clienteId)
+            .setPixId(chavePix.id)
+            .build()
+
+        val error = assertThrows<StatusRuntimeException> {
+            gRpcClient.removeChavePix(request)
+        }
+
+        with(error) {
+            assertEquals(Status.FAILED_PRECONDITION.code, status.code)
+            assertEquals("Chave pix não existe no BCB.", status.description)
+            assertFalse(repository.existsById(chavePix.id!!))
+        }
+    }
+
     @MockBean(ErpItauClient::class)
     fun erpItauMock(): ErpItauClient {
         return Mockito.mock(ErpItauClient::class.java)
     }
+
+    @MockBean(BcbClient::class)
+    fun bcbMock(): BcbClient {
+        return Mockito.mock(BcbClient::class.java)
+    }
+
 }

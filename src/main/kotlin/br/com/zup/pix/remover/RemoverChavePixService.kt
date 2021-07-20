@@ -2,7 +2,6 @@ package br.com.zup.pix.remover
 
 import br.com.zup.bcb.BcbClient
 import br.com.zup.bcb.DeletePixKeyRequest
-import br.com.zup.bcb.DeletePixKeyResponse
 import br.com.zup.common.handlers.ChavePixNaoExistenteException
 import br.com.zup.erp_itau.ErpItauClient
 import br.com.zup.pix.ChavePixRepository
@@ -39,7 +38,12 @@ class RemoverChavePixService(
         }
 
         val responseBCB = bcbClient.removerChavePix(chavePix.chave, requestBCB)
-        val chaveBCB = responseBCB.body() ?: throw IllegalStateException("Chave pix não existe no BCB.")
+        // normaliza a situação do sistema caso exista uma chave pix aqui, mas nao no BCB
+        if (responseBCB.body() == null) {
+            chavePixRepository.deleteById(request.pixId)
+            throw IllegalStateException("Chave pix não existe no BCB.")
+        }
+        val chaveBCB = responseBCB.body()
         logger.info("Chave Pix removida no BCB com sucesso: $chaveBCB")
 
         chavePixRepository.deleteById(request.pixId)
