@@ -2,6 +2,7 @@ package br.com.zup.pix.registrar
 
 import br.com.zup.TipoDaChave
 import br.com.zup.TipoDaConta
+import br.com.zup.bcb.CreatePixKeyResponse
 import br.com.zup.pix.*
 import io.micronaut.core.annotation.Introspected
 import java.util.*
@@ -22,11 +23,11 @@ data class NovaChavePix(
     @field:NotNull
     val tipoDaConta: TipoDaConta?
 ) {
-    fun toModel(conta: ContaCliente): ChavePix {
+    fun toModel(conta: ContaCliente, chaveBCB: String): ChavePix {
         return ChavePix(
             clienteId,
             tipoDaChave = TipoDaChave.valueOf(this.tipoDaChave!!.name),
-            chave = if (this.tipoDaChave == br.com.zup.pix.TipoDaChave.CHAVE_ALEATORIA) UUID.randomUUID().toString() else this.chave,
+            chave = if (this.tipoDaChave == br.com.zup.pix.TipoDaChave.CHAVE_ALEATORIA) chaveBCB else this.chave,
             tipoDaConta = TipoDaConta.valueOf(this.tipoDaConta!!.name),
             conta
         )
