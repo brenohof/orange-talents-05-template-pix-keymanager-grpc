@@ -21,7 +21,7 @@ class NovaChavePixEndpoint(
 
         responseObserver.onNext(
             NovaChavePixResponseGRpc.newBuilder()
-            .setPixID(chaveCriada.id)
+            .setPixId(chaveCriada.id)
             .build())
         responseObserver.onCompleted()
     }

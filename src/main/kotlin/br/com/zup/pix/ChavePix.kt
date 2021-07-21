@@ -3,6 +3,7 @@ package br.com.zup.pix
 import br.com.zup.TipoDaChave
 import br.com.zup.TipoDaConta
 import org.hibernate.annotations.GenericGenerator
+import java.time.LocalDateTime
 import javax.persistence.*
 import javax.validation.Valid
 import javax.validation.constraints.NotBlank
@@ -32,6 +33,9 @@ class ChavePix(
     @GeneratedValue(generator = "UUID")
     @GenericGenerator(name = "UUID", strategy = "org.hibernate.id.UUIDGenerator")
     val id: String? = null
+
+    @Column(nullable = false)
+    val criadaEm = LocalDateTime.now()
 
     override fun toString(): String {
         return "ChavePix(identificadorDoCliente='$clienteId', tipoDaChave=$tipoDaChave, chave='$chave', tipoDaConta=$tipoDaConta, id=$id)"

@@ -6,12 +6,50 @@ option java_outer_classname = "PixKeyManagerGrpc";
 
 package br.com.zup;
 
+import "google/protobuf/timestamp.proto";
+
 service PixKeyManagerGrpcService {
   rpc novaChavePix (NovaChavePixRequestGRpc) returns (NovaChavePixResponseGRpc) {}
 }
 
 service RemovePixKeyGrpcService {
   rpc removeChavePix (RemoveChavePixRequestGRpc) returns (RemoveChavePixResponseGRpc) {}
+}
+
+service ListaPixKeyGrpcService {
+  rpc listaChavePix (ListaChavePixRequest) returns (ListaChavePixResponse) {}
+}
+
+message ListaChavePixRequest {
+  message FiltroPorPixId {
+    string cliente_id = 1;
+    string pix_id = 2;
+  }
+
+  oneof filtro {
+    FiltroPorPixId pix_id = 1;
+    string chave = 2;
+  }
+}
+
+message ListaChavePixResponse {
+  string pix_id = 1;
+  string cliente_id = 2;
+  TipoDaChave tipo_da_chave = 3;
+  string chave = 4;
+  message Titular {
+    string nome = 1;
+    string cpf = 2;
+  }
+  Titular titular = 5;
+  message Conta {
+    string nome_da_institucao = 1;
+    string agencia = 2;
+    string numero = 3;
+    TipoDaConta tipo = 4;
+  }
+  Conta conta = 6;
+  google.protobuf.Timestamp criada_em = 7;
 }
 
 message RemoveChavePixRequestGRpc{
@@ -45,5 +83,5 @@ message NovaChavePixRequestGRpc {
 }
 
 message NovaChavePixResponseGRpc {
-  string pixID = 1;
+  string pix_id = 1;
 }

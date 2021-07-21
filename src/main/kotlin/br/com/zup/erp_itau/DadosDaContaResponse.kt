@@ -14,7 +14,7 @@ data class DadosDaContaResponse(
         return ContaCliente(
             instituicao = instituicao.nome,
             nomeDoTitular = titular.nome,
-            cpfDoTiular = titular.cpf,
+            cpfDoTitular = titular.cpf,
             agencia = agencia,
             numero = numero
         )

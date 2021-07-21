@@ -70,8 +70,8 @@ class NovaChavePixServiceTest(
         val response = grpcClient.novaChavePix(request)
 
         with(response) {
-            assertNotNull(pixID)
-            assertTrue(chavePixRepository.existsById(pixID))
+            assertNotNull(pixId)
+            assertTrue(chavePixRepository.existsById(pixId))
         }
     }
 

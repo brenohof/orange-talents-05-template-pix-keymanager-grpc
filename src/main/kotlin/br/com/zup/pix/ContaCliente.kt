@@ -4,10 +4,10 @@ import javax.persistence.Embeddable
 
 @Embeddable
 class ContaCliente(
-    instituicao: String,
-    nomeDoTitular: String,
-    cpfDoTiular: String,
-    agencia: String,
-    numero: String
+    val instituicao: String,
+    val nomeDoTitular: String,
+    val cpfDoTitular: String,
+    val agencia: String,
+    val numero: String
 )
 
