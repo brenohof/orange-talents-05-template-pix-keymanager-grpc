@@ -1,4 +1,4 @@
-package br.com.zup.pix.listar
+package br.com.zup.pix.detalhar
 
 import br.com.zup.ListaChavePixRequest
 import br.com.zup.ListaChavePixRequest.FiltroCase

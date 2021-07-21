@@ -3,8 +3,8 @@ package br.com.zup.bcb
 import br.com.zup.TipoDaChave
 import br.com.zup.TipoDaConta
 import br.com.zup.pix.ContaCliente
-import br.com.zup.pix.listar.ChavePixInfo
-import br.com.zup.pix.listar.Instituicoes
+import br.com.zup.pix.detalhar.ChavePixInfo
+import br.com.zup.pix.detalhar.Instituicoes
 import java.time.LocalDateTime
 
 data class PixKeyDetailsResponse(

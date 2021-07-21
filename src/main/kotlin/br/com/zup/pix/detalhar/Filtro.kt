@@ -1,4 +1,4 @@
-package br.com.zup.pix.listar
+package br.com.zup.pix.detalhar
 
 import br.com.zup.bcb.BcbClient
 import br.com.zup.common.handlers.ChavePixNaoExistenteException
@@ -22,7 +22,7 @@ sealed class Filtro {
         override fun filtra(repository: ChavePixRepository, bcbClient: BcbClient): ChavePixInfo {
             return repository.findById(pixId)
                 .filter {it.clienteId == clienteId}
-                .map(ChavePixInfo::of)
+                .map(ChavePixInfo.Companion::of)
                 .orElseThrow { ChavePixNaoExistenteException("Chave Pix não encontrada.") }
         }
     }
@@ -31,7 +31,7 @@ sealed class Filtro {
     data class PorChave(@field:NotBlank @Size(max = 77) val chave: String) : Filtro() {
         override fun filtra(repository: ChavePixRepository, bcbClient: BcbClient): ChavePixInfo {
             return repository.findByChave(chave)
-                .map(ChavePixInfo::of)
+                .map(ChavePixInfo.Companion::of)
                 .orElseGet {
                     val response = bcbClient.buscarPorChavePix(chave)
                     when (response.status) {
