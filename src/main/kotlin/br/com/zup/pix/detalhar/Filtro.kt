@@ -23,18 +23,18 @@ sealed class Filtro {
             return repository.findById(pixId)
                 .filter {it.clienteId == clienteId}
                 .map(ChavePixInfo.Companion::of)
-                .orElseThrow { ChavePixNaoExistenteException("Chave Pix não encontrada.") }
+                .orElseThrow { ChavePixNaoExistenteException("Chave Pix não encontrada") }
         }
     }
 
     @Introspected
-    data class PorChave(@field:NotBlank @Size(max = 77) val chave: String) : Filtro() {
+    data class PorChave(@field:NotBlank @field:Size(max = 77) val chave: String) : Filtro() {
         override fun filtra(repository: ChavePixRepository, bcbClient: BcbClient): ChavePixInfo {
             return repository.findByChave(chave)
                 .map(ChavePixInfo.Companion::of)
                 .orElseGet {
                     val response = bcbClient.buscarPorChavePix(chave)
-                    when (response.status) {
+                        when (response.status) {
                         HttpStatus.OK -> response.body()?.toChavePixInfo()
                         else -> throw ChavePixNaoExistenteException("Chave Pix não encontrada")
                     }
