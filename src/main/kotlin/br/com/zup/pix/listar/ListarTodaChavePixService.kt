@@ -9,7 +9,7 @@ import javax.validation.constraints.NotBlank
 
 @Validated
 @Singleton
-class ListaTodaChavePixService(
+class ListarTodaChavePixService(
     val repository: ChavePixRepository,
     val erpItauClient: ErpItauClient
 ) {

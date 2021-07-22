@@ -26,4 +26,10 @@ class Clients {
             ListaPixKeyGrpcServiceGrpc.ListaPixKeyGrpcServiceBlockingStub {
         return ListaPixKeyGrpcServiceGrpc.newBlockingStub(channel)
     }
+
+    @Singleton
+    fun listaChavePixBlockingStub(@GrpcChannel(GrpcServerChannel.NAME) channel: ManagedChannel):
+           ListarTodasPixKeyGrpcServiceGrpc.ListarTodasPixKeyGrpcServiceBlockingStub {
+        return ListarTodasPixKeyGrpcServiceGrpc.newBlockingStub(channel)
+    }
 }

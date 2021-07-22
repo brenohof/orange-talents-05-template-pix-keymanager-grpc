@@ -55,6 +55,7 @@ dependencies {
     testRuntimeOnly("org.junit.jupiter:junit-jupiter-engine:5.7.0")
     testImplementation("com.h2database:h2")
     testRuntimeOnly("com.fasterxml.jackson.module:jackson-module-kotlin")
+    testImplementation("org.hamcrest:hamcrest-all:1.3")
 }
 
 

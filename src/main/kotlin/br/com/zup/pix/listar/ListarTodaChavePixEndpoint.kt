@@ -10,7 +10,7 @@ import javax.inject.Singleton
 @ErrorHandler
 @Singleton
 class ListarTodaChavePixEndpoint(
-    val service: ListaTodaChavePixService
+    val service: ListarTodaChavePixService
 ) : ListarTodasPixKeyGrpcServiceGrpc.ListarTodasPixKeyGrpcServiceImplBase() {
 
     override fun listaTodasChavePix(
