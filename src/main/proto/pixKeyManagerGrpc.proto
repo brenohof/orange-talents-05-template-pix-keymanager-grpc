@@ -20,6 +20,28 @@ service ListaPixKeyGrpcService {
   rpc listaChavePix (ListaChavePixRequest) returns (ListaChavePixResponse) {}
 }
 
+service ListarTodasPixKeyGrpcService {
+  rpc listaTodasChavePix (ListaTodasChavePixRequest) returns (ListaTodasChavePixResponse) {}
+}
+
+message ListaTodasChavePixRequest {
+  string cliente_id = 1;
+}
+
+message PixKeyResponse {
+  string pix_id = 1;
+  string cliente_id = 2;
+  TipoDaChave tipo_da_chave = 3;
+  string chave = 4;
+  TipoDaConta tipo_da_conta = 5;
+  google.protobuf.Timestamp criada_em = 6;
+}
+
+message ListaTodasChavePixResponse {
+  string cliente_id = 1;
+  repeated PixKeyResponse chaves = 2;
+}
+
 message ListaChavePixRequest {
   message FiltroPorPixId {
     string cliente_id = 1;
