@@ -21,7 +21,7 @@ sealed class Filtro {
 
         override fun filtra(repository: ChavePixRepository, bcbClient: BcbClient): ChavePixInfo {
             return repository.findById(pixId)
-                .filter {it.clienteId == clienteId}
+                .filter {it.pertenceAoCliente(clienteId)}
                 .map(ChavePixInfo.Companion::of)
                 .orElseThrow { ChavePixNaoExistenteException("Chave Pix não encontrada") }
         }

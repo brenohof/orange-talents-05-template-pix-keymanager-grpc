@@ -5,6 +5,7 @@ import br.com.zup.ListaPixKeyGrpcServiceGrpc
 import br.com.zup.TipoDaChave
 import br.com.zup.TipoDaConta
 import br.com.zup.bcb.*
+import br.com.zup.erp_itau.ErpItauClient
 import br.com.zup.pix.ChavePix
 import br.com.zup.pix.ChavePixRepository
 import br.com.zup.pix.ContaCliente
@@ -92,6 +93,27 @@ class ListaChavePixEndPointTest(
         with(error) {
             assertEquals(Status.NOT_FOUND.code, status.code)
             assertEquals("Chave Pix não encontrada", status.description)
+        }
+    }
+
+    @Test
+    internal fun `nao deve listar uma chave de dono diferente`() {
+        val clienteIdDiferente = UUID.randomUUID().toString()
+        val request = ListaChavePixRequest.newBuilder()
+            .setPixId(
+                ListaChavePixRequest.FiltroPorPixId.newBuilder()
+                    .setPixId(pixId)
+                    .setClienteId(clienteIdDiferente)
+                    .build()
+            )
+            .build()
+        val error = assertThrows<StatusRuntimeException>{
+            grpcClient.listaChavePix(request)
+        }
+
+        with(error) {
+            assertEquals(Status.FAILED_PRECONDITION.code, status.code)
+            assertEquals("Cliente não é dono da chave.", status.description)
         }
     }
 

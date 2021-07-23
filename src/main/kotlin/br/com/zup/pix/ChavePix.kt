@@ -40,4 +40,13 @@ class ChavePix(
     override fun toString(): String {
         return "ChavePix(identificadorDoCliente='$clienteId', tipoDaChave=$tipoDaChave, chave='$chave', tipoDaConta=$tipoDaConta, id=$id)"
     }
+
+    // melhorar depois xD
+    fun pertenceAoCliente(clienteId: String): Boolean {
+        if (this.clienteId == clienteId) {
+            return true
+        } else {
+            throw IllegalStateException("Cliente não é dono da chave.")
+        }
+    }
 }
