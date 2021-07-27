@@ -1,5 +1,21 @@
 version: '3'
 services:
+    keymanager-grpc:
+      build:
+        dockerfile: ./Dockerfile
+        context: .
+      ports:
+      - 50051:50051
+      depends_on:
+        - postgres
+        - bcb
+        - erp-itau
+      environment:
+        DB_URL: jdbc:postgresql://postgres:5432/postgres
+        DB_USER: postgres
+        DB_PASS: postgres
+        ERP_ITAU_URL: http://erp-itau:9091
+        BCB_PIX_URL: http://bcb:8082
     bcb:
         image: "public.ecr.aws/d8b2x5c9/orange-stack-sat-bcb-pix"
         ports: 
