@@ -1,6 +1,7 @@
 micronaut:
   application:
-    name: pixKeyManagerGrpc
+    name: ${APP_NAME:`keymanager-grpc`}
+
 
 datasources:
   default:
